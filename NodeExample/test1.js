@@ -24,8 +24,12 @@ console.time('duration_time')
 var count2 = 0;
 for (var i  = 0; i < 10000; i++){
     count2+= i;
+    
 }
-console.log('%d', count2)
+console.log('%d', count2);
+
+
+
 
 console.timeEnd('duration_time');
 
@@ -34,6 +38,12 @@ console.timeEnd('duration_time');
 console.log("파일이름: %s", __filename);
 console.log('패스 :  %s', __dirname)
 
+
+
+
 process.argv.forEach(function(item, index){
             console.log(index + ": " + item)
             });
+
+
+            
