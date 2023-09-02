@@ -1,6 +1,7 @@
 
 let EventEmitter = require('events').EventEmitter;
-const { type } = require('os');
+
+
 let util = require('util')
 
 let Calc = function(){
