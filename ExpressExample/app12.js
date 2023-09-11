@@ -19,9 +19,9 @@ app.set('port', process.env.PORT || 3000);
 //이렇게 /public 앞에 붙히면 앞에 public을 쳐야됨 뺴면 안침
 app.use('/public',static(path.join(__dirname, 'public')));
 
-
-app.use(bodyParser.urlencoded({extended:false}));
-app.use(bodyParser.json());
+//body parser 대신 express씀 
+app.use(express.urlencoded({extended:false}));
+app.use(express.json());
 
 app.use(cookieParser());
 
