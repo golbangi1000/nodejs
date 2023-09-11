@@ -3,7 +3,7 @@ let fs = require('fs');
 let server = http.createServer();
 //http 서버 객체
 
-let host = '192.168.35.80';
+let host = '172.30.1.63';
 let port = 3000;
 
 server.listen(port,host,'50000', function(){
