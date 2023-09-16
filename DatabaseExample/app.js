@@ -1,3 +1,4 @@
+
 const express = require('express');
 const http = require('http');
 
@@ -8,30 +9,32 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 
 const expressSession = require('express-session');
+const mongoose = require('mongoose')
 
 //에러 핸들러 모듈 사용
 const expressErrorHandler = require('express-error-handler');
 
 // mongodb 모듈 사용
 
- const mongoClient = require('mongodb').MongoClient;
+ const MongoClient = require('mongodb').MongoClient;
 
- let database;
-
- function connectDB(){
-    let databaesUrl = 'mongodb://localhost:27017/local'
-
-    MongoClient.connect(databaesUrl, function(err,db){
-        if(err) {
-            console.log('데이터베이스 연결시 에러 발생함.')
-            return;
+ var database;
+    var databaseUrl = 'mongodb://127.0.0.1:27017'
+    MongoClient.connect(databaseUrl,(err, client) => {
+        if (err) {
+            console.log('DB 에러 발생!!')
         }
+        console.log('DB 연결됨 :  ' + databaseUrl)
+        
+        database = client.db("local")
+        app.listen(3000, function(){
+            console.log('db connected')
+        })
+        
+    })
 
-        console.log('데이터베이스에 연결됨:' +  databaesUrl);
-        databse = db;
 
-    });
- }
+
 
 
 const app = express();
@@ -65,7 +68,42 @@ router.route('/process/login').post(function(req,res){
     const paramId = req.body.id || req.query.id;
     const paramPassword = req.body.password || req.query.password;
 
-    console.log('요청한 파라미터 : ' + paramId);
+    console.log('요청한 파라미터 : ' + paramId + ', '  + paramPassword);
+
+    if(database){
+        authUser(database,paramId,paramPassword, function(err,docs){
+            if(err){
+                console.log('에러발생1');
+                res.writeHead(200,{"Content-Type":"text/html;charset=utf8"});
+                res.write('<h1>에러 발생</h1>');
+                res.end();
+                return; 
+            }
+
+            if(docs){
+                console.dir(docs);
+                res.writeHead(200,{"Content-Type":"text/html;charset=utf8"});
+                res.write('<h1>사용자 로그인 성공</h1>');
+                res.write('<div><p>사용자 : ' + docs[0].name + '</p></div>')
+                res.write('<br><br> <a href = "/public/login.html> 다시 로그인 하기</a>')
+                res.end();
+                
+
+            } else{
+                console.log('에러발생2');
+                res.writeHead(200, {"Content-Type" : "text/html;charset=utf8"});
+                res.write('<h1> 데이터 없음 </h1>')
+                res.end();
+                
+            }
+        });
+    }   else{
+        console.log('에러발생3');
+            res.writeHead(200, {"Content-Type" : "text/html;charset=utf8"});
+            res.write('<h1> 데이터베이스 연결안됨 </h1>')
+            res.end();
+                
+    }
 
 });
 
@@ -109,5 +147,5 @@ const errorHandler = expressErrorHandler({
 const server = http.createServer(app).listen(app.get('port'), function () {
     console.log('익스프레스로 웹서버를 실행함 : ' + app.get('port'));
 
-    connectDB();
+    // connectDB();
 })
