@@ -29,7 +29,7 @@ var UserModel;
 function connectDB(){
 
 	//데이터베이스 연결 정보
-	var databaseUrl = "mongodb://127.0.0.1:27017/local";
+	var databaseUrl = 'mongodb://127.0.0.1:27017/local';
 
 	//연결
 	mongoose.connect(databaseUrl); //몽고DB의 정보를 몽구스모듈과 연결해준다.
@@ -56,6 +56,7 @@ function connectDB(){
 		console.log("UserModel 정의함.");
 		
 	}); 
+
 						//function자리에 한번에써준것.
 	database.on("error",console.error.bind(console,"몽구스 모듈 에러")); //이렇게 한줄로 써줄수도있다.
 									
@@ -86,37 +87,44 @@ app.use(expressSession({
 
 //작업하는 함수를 만들고 그걸 불러쓰는 라우터를 만듬.
 //사용자를 인증하는 함수
-var authUser = function(database,id,pwd,callback){ //위에서 만든 database
+var authUser = function(database,id,pwd,callback){ 
 
-	console.log("addUser 함수 호출");
+	console.log("authuser 함수 호출");
 
-	//아이디와 비밀번호 검색할것. 여러개나올 수 있으니 배열로 받음
-	// UserModel.find({"id":id,"pwd":pwd},function (err,result){
+	// UserModel.find({"id":id,"pwd":pwd},async (err,result) =>{
 		
-	// 	//스키마와 모델을 정의해준값에 의해 UserModel에 users가 들어있는것
 	// 	if(err){
-	// 		callback(err,null); //에러가 있으면 에러 출력후 스톱
+	// 		callback(err,null); 
 	// 		return;
 	// 	}
 
-	// 	//데이터가 있을경우
 	// 	if(result.length>0){
 
-	// 		callback(null,result); //데이터가 있으면 데이터 전송
+	// 		callback(null,result); 
 
 	// 	}else{
 
 	// 		console.log("일치하는 데이터가 없습니다.");
-	// 		callback(null,null); //에러도 없으니깐 null,데이터도없으니깐 null
+	// 		callback(null,null); 
 	// 	}
 	// });
-    UserModel.find({"id":id,"pwd":pwd})
-    .then(function (err){
-        callback(null,result); //데이터가 있으면 데이터 전송
-    })
-    .catch(function (result) {
-        console.log(err);
-      });
+	
+	UserModel.find({"id":id,"password":pwd})
+	.then(result => {
+		if(result.length>0){
+			callback(null,result)
+		} else{
+			console.log(result);
+			console.dir(result);
+			console.log('일치하는 데이터가 없습니다');
+			callback(null,null)
+		}
+	})
+	.catch((err) =>{
+		callback(err,null);
+		return
+	})
+
 }
 
 //사용자를 추가하는 함수
@@ -129,7 +137,7 @@ var addUser = function(database,id,pwd,name,callback){
 	users.save(function(err,result){
 
 		if(err){
-			callback(err,null);
+			callback(err,null);	
 			return;
 		}
 
