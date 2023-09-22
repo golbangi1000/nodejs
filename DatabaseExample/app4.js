@@ -42,16 +42,43 @@ function connectDB(){
 		
 		//스키마 정의
 		UserSchema = mongoose.Schema({
-			id:String,
-			name:String,
-			pwd:String
-			
+            id:{type: String, required: true, unique: true},
+            password: {type: String , require: true},
+			name:{type: String , index: 'hashed'},
+			age: {type : Number, 'default':-1},
+            created_at:{type:Date, index: {unique:false}, 'default':Date.now()},
+            updated_at:{type:Date, index: {unique:false}, 'default':Date.now()}
 		});
 		
 		console.log("UserSchema 정의함.");
+
+
+        // UserSchema.static('findById', function(id, callback){
+        //     return this.find({id:id}, callback);
+        // });
+
+        UserSchema.static('findById', async function(id) {
+            const user = await this.find({id:id});
+            return user;
+          });
+
+        
+        //이런 방식도 됨 
+        // UserSchema.statics.findById = function(id, callback){
+        //     //javascript this는 함수를 호출한객체가 this로 참조가됨
+        //     //find가 model 객체를 참조하는거다 
+        //     return this.find({id:id}, callback)
+        // }
+        
+
+        UserSchema.static('findAll', function(callback){
+            return this.find({},callback);
+        });
+
+         
 		
 		//Model 정의 - 스키마를 정의했으면 Model를 정의해야 함
-		UserModel = mongoose.model("users",UserSchema);//users 테이블에 UserSchema를 적용해라
+		UserModel = mongoose.model("users2",UserSchema);//users 테이블에 UserSchema를 적용해라
 		
 		console.log("UserModel 정의함.");
 		
@@ -91,6 +118,29 @@ var authUser = function(database,id,pwd,callback){
 
 	console.log("authuser 함수 호출");
 
+    UserModel.findById(id,function(err,results){
+        if(err){
+            callback(err,null)
+            return
+        }
+
+        console.log('아이디 %s로 검색됨.')
+        if(results.length> 0){
+            if(results[0]._doc.password === pwd){
+                console.log('비밀번호 일치함');
+                callback(null,results);
+            } else{
+                console.log('비밀번호 일치하지않음')
+                callback(null,null);
+            }
+        } else {
+            console.log('아이디 일치하는 사용자 없음')
+            callback(null,null);
+        }
+        
+    });
+    
+
 	// UserModel.find({"id":id,"pwd":pwd},async (err,result) =>{
 		
 	// 	if(err){
@@ -109,21 +159,21 @@ var authUser = function(database,id,pwd,callback){
 	// 	}
 	// });
 	
-	UserModel.find({"id":id,"password":pwd})
-	.then(result => {
-		if(result.length>0){
-			callback(null,result)
-		} else{
-			console.log(result);
-			console.dir(result);
-			console.log('일치하는 데이터가 없습니다');
-			callback(null,null)
-		}
-	})
-	.catch((err) =>{
-		callback(err,null);
-		return
-	})
+	// UserModel.find({"id":id,"password":pwd})
+	// .then(result => {
+	// 	if(result.length>0){
+	// 		callback(null,result)
+	// 	} else{
+	// 		console.log(result);
+	// 		console.dir(result);
+	// 		console.log('일치하는 데이터가 없습니다');
+	// 		callback(null,null)
+	// 	}
+	// })
+	// .catch((err) =>{
+	// 	callback(err,null);
+	// 	return
+	// })
 
 }
 
@@ -175,6 +225,52 @@ var addUser = function(database,id,pwd,name,callback){
 //-----------------------------------------------------------------------------
 //라우터 객체 생성
 var router = express.Router();
+
+router.route('/process/listuser').post(function(req,res){
+    console.log('/process/listure 라우팅함수 호출됨');
+
+    if(database){
+        UserModel.findAll(function(err,results){
+            if(err){
+                console.log('에러발생')
+                res.writeHead(200, {"Content-Type":"text/html;charset=utf8"});
+                res.write('<h1>에러발생</h1>')
+                res.end();
+                return;
+            }
+
+            if(results){
+                console.dir(results);
+
+                res.writeHead(  200, {"Content-type:": "text/html;charset=utf8"})
+                res.write("<h3>사용자 리스트</h3>")
+                res.write("<div><ul>");
+
+                for(var i = 0; i < results.length; i++){
+                    var curId = results[i]._doc.id;
+                    var curName = results[i]._doc.name;
+                    res.write(" <li>#" + i + " -> " + curId + ", " + curName+ "</li>" )
+
+                }
+
+                res.write("</ul></div>")
+                res.end();
+            } else {
+                console.log('에러발생')
+                res.writeHead(200, {"Content-Type":"text/html;charset=utf8"});
+                res.write('<h1>조회된 사용자 없음</h1>')
+                res.end();
+            }
+        });
+    } else{
+        console.log('에러발생');
+        res.writeHead(200, {"Content-Type":"text/html;charset=utf8"});
+        res.write("<h1>데이터베이스 연결 안됨</h1>");
+        res.end();
+    }
+
+});
+
 
 //로그인 라우터
 router.route("/process/login").post(function(req,res){
