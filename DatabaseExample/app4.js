@@ -71,9 +71,12 @@ function connectDB(){
         // }
         
 
-        UserSchema.static('findAll', function(callback){
-            return this.find({},callback);
-        });
+        // UserSchema.static('findAll', function(callback){
+        //     return this.find({},callback);
+        // });
+		UserSchema.static('findAll', async function(){
+			return this.find({});
+		})
 
          
 		
@@ -118,27 +121,49 @@ var authUser = function(database,id,pwd,callback){
 
 	console.log("authuser 함수 호출");
 
-    UserModel.findById(id,function(err,results){
-        if(err){
-            callback(err,null)
-            return
-        }
+	//--------------------schema static 
+	UserModel.findById(id)
+	.then(result => {
+		if(result.length>0){
+			if(result[0]._doc.password === pwd){
+				console.log('비밀번호 일치함 성공');
+				callback(null,result);
+			} else{
+				console.log('비밀번호 일치하지않음 실패')
+				callback(null,null);
+			}
+		} else {
+			console.log('아이디 일치하는 사용자 없음')
+			callback(null,null);
+		}
+		
+	})	
+	// .catch((err) =>{
+	// 	callback(err,null);
+	// 	return
+	// })
+    // UserModel.findById(id,function(err,results){
+    //     if(err){
+    //         callback(err,null)
+    //         return
+    //     }
 
-        console.log('아이디 %s로 검색됨.')
-        if(results.length> 0){
-            if(results[0]._doc.password === pwd){
-                console.log('비밀번호 일치함');
-                callback(null,results);
-            } else{
-                console.log('비밀번호 일치하지않음')
-                callback(null,null);
-            }
-        } else {
-            console.log('아이디 일치하는 사용자 없음')
-            callback(null,null);
-        }
+	// 예전 버전 callback 써도될떄
+    //     console.log('아이디 %s로 검색됨.')
+    //     if(results.length> 0){
+    //         if(results[0]._doc.password === pwd){
+    //             console.log('비밀번호 일치함');
+    //             callback(null,results);
+    //         } else{
+    //             console.log('비밀번호 일치하지않음')
+    //             callback(null,null);
+    //         }
+    //     } else {
+    //         console.log('아이디 일치하는 사용자 없음')
+    //         callback(null,null);
+    //     }
         
-    });
+    // });
     
 
 	// UserModel.find({"id":id,"pwd":pwd},async (err,result) =>{
@@ -159,6 +184,7 @@ var authUser = function(database,id,pwd,callback){
 	// 	}
 	// });
 	
+	// callback 못쓸때 쓰는거
 	// UserModel.find({"id":id,"password":pwd})
 	// .then(result => {
 	// 	if(result.length>0){
@@ -229,6 +255,7 @@ var router = express.Router();
 router.route('/process/listuser').post(function(req,res){
     console.log('/process/listure 라우팅함수 호출됨');
 
+	//집에서 해보기
     if(database){
         UserModel.findAll(function(err,results){
             if(err){
