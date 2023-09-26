@@ -24,6 +24,7 @@ var expressSession = require("express-session");
 
 //mongoose 모듈
 var mongoose = require("mongoose");
+const { authenticate } = require("passport");
 
 //데이터베이스 객체를 위한 변수
 var database; //==connection conn; 과 같음
@@ -162,7 +163,7 @@ app.use(expressSession({
 
 //작업하는 함수를 만들고 그걸 불러쓰는 라우터를 만듬.
 //사용자를 인증하는 함수
-var authUser = function(database,id,pwd,callback){ 
+var authUser = function(database,id,password,callback){ 
 
 	console.log("authuser 함수 호출");
 
@@ -171,12 +172,12 @@ var authUser = function(database,id,pwd,callback){
 	.then(result => {
 		if(result.length>0){
             var user = new UserModel({id:id});
-            var autheticated = user.authenticate(password,result[0]._doc.salt,
+            var authenticated = user.authenticate(password,result[0]._doc.salt,
                result[0]._doc.hashed_password);
             
 
 
-			if(auth){
+			if(authenticated){
 				console.log('비밀번호 일치함 성공');
 				callback(null,result);
 			} else{
