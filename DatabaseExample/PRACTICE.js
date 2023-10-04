@@ -5,8 +5,14 @@
 //     const lastName = v.substring(v.indexOf(' ') + 1);
 
 
-let v = 'abcd';
-let a = 'boom'
+let boom = {ad:'aweg',awef:1235}
 
 
- console.log(`${v} ${a}` )
+// boom = null;
+
+
+if(boom){
+    console.dir(boom)
+} else{
+    console.log('boom is null')
+}

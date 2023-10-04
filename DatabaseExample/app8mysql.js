@@ -25,7 +25,7 @@ var UserSchema;
 //데이터베이스 모델을 위한 변수
 var UserModel;
 
-var mysql = require('mysql');
+var mysql = require('mysql2');
 
 const pool = mysql.createPool({
     connectionLimit:10,//connection을 몇개를 만들꺼냐
@@ -69,12 +69,13 @@ var addUser = function(id, name, age, password,callback){
 
 
         //뭘 넘길지 객체로 넘겨주면 그대로 저장해줌 
-        const data  = {id:id, name:name, age:age, password:password };
-        conn.query('INSERT INTO USERS SET ?', data, function(err,result){
+        const data  = {id:id, name:name, age:age, password:password};
+        const exec = conn.query('INSERT INTO USERS SET ?', data,
+         function(err,result){
             conn.release();
-            console.log('실행된 SQL:' + exec.mysql);
-            console.dir(exec)
-            console.dir(exec.mysql)
+            console.log('실행된 SQL:' + exec.sql);
+            // console.dir(exec)
+            // console.dir(exec.mysql)
 
             if(err){
                 console.log('SQL 실행시 에러발생')
@@ -91,43 +92,49 @@ var addUser = function(id, name, age, password,callback){
 
 //작업하는 함수를 만들고 그걸 불러쓰는 라우터를 만듬.
 //사용자를 인증하는 함수
-var authUser = function(database,id,pwd,callback){ 
+var authUser = function(id,password,callback){ 
 
 	console.log("authuser 함수 호출");
 
-	// UserModel.find({"id":id,"pwd":pwd},async (err,result) =>{
-		
-	// 	if(err){
-	// 		callback(err,null); 
-	// 		return;
-	// 	}
+    pool.getConnection(function(err, conn){
+        if(err){
+            if(conn){
+                conn.release();
+                return;
+            } 
+            callback(err,null);
+            return;
+        }
+        console.log('데이터베이스 연결 스레드 아이디:' + conn.threadId);
 
-	// 	if(result.length>0){
+        const tableName = 'users';
+        const columns = ['id',  'name', 'age'];
+        const exec = conn.query('SELECT ?? FROM ?? WHERE ID  = ? AND PASSWORD = ?', [columns,tableName,id,password],
+         function(err, rows){ 
+            conn.release();
+            console.log('실행된 SQL:' + exec.sql)
 
-	// 		callback(null,result); 
+            if(err){
+                console.log('에러')
+                callback(err,null);
+                return;
+            }
+            
+        if(rows.length > 0){
+            console.log('사용자 찾음 ')
+            callback(null,rows);
+        } else{
+            console.log('사용자 찾지 못함');
+            callback(null, null);
+        }
 
-	// 	}else{
 
-	// 		console.log("일치하는 데이터가 없습니다.");
-	// 		callback(null,null); 
-	// 	}
-	// });
-	
-	UserModel.find({"id":id,"password":pwd})
-	.then(result => {
-		if(result.length>0){
-			callback(null,result)
-		} else{
-			console.log(result);
-			console.dir(result);
-			console.log('일치하는 데이터가 없습니다');
-			callback(null,null)
-		}
-	})
-	.catch((err) =>{
-		callback(err,null);
-		return
-	})
+        })
+
+       
+
+
+    });
 
 }
 
@@ -139,36 +146,37 @@ router.route('/process/adduser').post(function(req,res){
     console.log('/process/addUser 라우팅 함수 호출됨')
 
     const paramId = req.query.id || req.body.id; //get 은 body
-    const paramPassword = req.query.password;
-    const paramName = req.query.name;
-    const paramAge = req.query.age;
+    const paramName = req.query.name || req.body.name;
+    const paramAge = req.query.age || req.body.age;
+    const paramPassword = req.query.password || req.body.password;
 
     console.log('요청 파라미터 리스트: ' + paramId + ', ' + paramPassword + ', ' + paramName + ', ' + paramAge + ', ');
 
-    addUser(paramId,paramPassword, paramName,paramAge, function(err,addedUser){
+    const age = Number(paramAge);
+    addUser(paramId,paramName, age, paramPassword, function(err,addedUser){
         if(err){
 
             console.log('에러발생')
-            res.writeHead(200,{"Content-Type":"text/html;charset=utf8"});
+            res.writeHead(200,{"Content-type":"text/html;charset=utf-8"});
             res.write('<h1>에러발생</h1>');
+            res.write('<h1>      에러:  ' +  err + '</h1>');
             res.end();
             return;
         }
 
         if(addedUser){
-            console.dir(addedUser);
+            // console.dir(addedUser);
 
-            res.writeHead(200, {"Content-type":"test/html;charset=utf8"});
+            res.writeHead(200, {"Content-type":"text/html;charset=utf-8"});
             res.write('<h1>사용자 추가 성공</h1>');
-            res.write('<div><p>사용자 : '  + docs[0].name + '</p></div>');
             res.write('<br>');
             res.write('<br>');
             res.write('<a href="/public/login.html">다시 로그인 하기</a>');
             res.end();
         } else{
             console.log('에러발생')
-            res.writeHead(200,{"Content-Type":"text/html;charset=utf8"});
-            res.write('<h1>에러발생</h1>');
+            res.writeHead(200,{"Content-type":"text/html;charset=utf-8"});
+            res.write('<h1>사용자 추가실패</h1>');
             res.end();
             return;
         }
@@ -187,15 +195,15 @@ router.route("/process/login").post(function(req,res){
 	var id = req.body.id;
 	var pwd = req.body.pwd;
 
-	if(database){
 		//callback함수가 되는것
-		authUser(database, id, pwd, function(err,result){ //위 사용자 인증 함수로 올라감
+		authUser( id, pwd, function(err,rows){ //위 사용자 인증 함수로 올라감
 
 			if(err) throw err;
 
-			if(result){ //데이터가 있으면
-
-				var userName = result[0].name;//위에서 데이터를 배열로 받기로 했슴
+			if(rows){ //데이터가 있으면
+                console.dir(rows);
+                
+				var userName = rows[0].name;//위에서 데이터를 배열로 받기로 했슴
 				
 				res.writeHead("200",{"Content-type":"text/html;charset=utf-8"});
 				res.write("<h1>로그인 성 공 ~ ~</h1>");
@@ -217,62 +225,11 @@ router.route("/process/login").post(function(req,res){
 		});
 
 
-	}else{
-
-		res.writeHead("200",{"Content-type":"text/html;charset=utf-8"});
-		res.write("<h1>DB연결 실 패 ㅠ-ㅠ</h1>");
-		res.write("<div>DB를 연결하지 못했습니다</div>");
-		res.end();
-
-	}
+	
 
 
 
 });
-
-router.route("/process/addUser").post(function(req,res){
-
-	console.log("/process/addUser 호출");
-
-	var id = req.body.id;
-	var pwd = req.body.pwd;
-	var name = req.body.name;
-
-	if(database){
-
-		addUser(database,id,pwd,name, function(err,result){ //함수속 매개변수는 사용자 정의
-
-			if(err) throw err;
-
-			if(result){
-
-				res.writeHead("200",{"Content-type":"text/html;charset=utf-8"});
-				res.write("<h1>사용자 추가 성공</h1>");
-				res.write("<h2>사용자 ID" + id+"이름:"+ name+ "</h2>")
-				res.end();
-
-
-			}else{
-
-				res.writeHead("200",{"Content-type":"text/html;charset=utf-8"});
-				res.write("<h1>사용자 추가 실패</h1>");
-				res.end();
-
-			}
-
-		});
-
-	}else{
-
-		res.writeHead("200",{"Content-type":"text/html;charset=utf-8"});
-		res.write("<h1>DB연결 실 패 ㅠ-ㅠ</h1>");
-		res.write("<div>DB를 연결하지 못했습니다</div>");
-		res.end();
-
-	}
-
-});
-
 
 //라우터 객체 등록
 app.use("/",router);
@@ -295,7 +252,5 @@ http.createServer(app).listen(app.get("port"),function(){ //위에 set으로 넣
 
 	console.log("익스프레스 서버 on~~ 포트번호는:" + app.get("port"));
 
-	//DB연결 함수 호출
-	connectDB(); 
-
+	
 });
