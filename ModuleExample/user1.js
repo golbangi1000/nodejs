@@ -1,5 +1,9 @@
-export function getUser(){
-    return{id : 'test01', password: '소녀시대'};
+function getUser(){
+    return{id : 'test01', name: '소녀시대'};
 }
 
-export const group  = {id: 'group1', name:'친구'};
+const group  = {id: 'group1', name:'친구'};
+
+
+
+export {getUser,group};
