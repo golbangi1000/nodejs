@@ -2,9 +2,12 @@
 // require("dotenv").config();
 import dotenv from 'dotenv';
 dotenv.config();
-import express, { urlencoded, Router } from "express";
-import { createServer } from "http";
-import { join } from "path";
+import express from "express";
+const Router = express.Router;
+const urlencoded = express.urlencoded;
+import  http from "http";
+const createServer = http.createServer;
+import path from "path";
 //var bodyParser = require("body-parser"); //예전에는 bodyParser를 호출해야 했지만 express에 내장이 되어 안써도 괜춘
 import serveStatic from "serve-static"; //특정 폴더를 패스로 접근 가능하게 하는것.
 
@@ -25,10 +28,14 @@ import * as user1 from "./routes/user.js";
 //mongoose 모듈
 // import { connect, connection, model } from "mongoose";
 import mongoose from "mongoose";
+
 // import { authenticate } from "passport";
 
 import userSchema from "./database/user_schema.js";
 
+
+import { fileURLToPath } from "url";
+const __dirname = fileURLToPath(new URL(".", import.meta.url));
 //데이터베이스 객체를 위한 변수
 var database; //==connection conn; 과 같음
 
@@ -45,7 +52,8 @@ app.set("port", process.env.PORT || 3000);
 
 app.use(urlencoded({ extended: false }));
 
-app.use("/public", serveStatic(join(__dirname, "public"))); //public (실제)폴더의 이름을 써준것
+
+app.use("/public", serveStatic(path.join(__dirname, "public"))); //public (실제)폴더의 이름을 써준것
 //사용자정의
 
 app.use(
@@ -73,7 +81,7 @@ function connectDB() {
 
     createUserSchema(database);
     //Model 정의 - 스키마를 정의했으면 Model를 정의해야 함
-    UserModel = model("users3", UserSchema); //users 테이블에 UserSchema를 적용해라
+    UserModel = mongoose.model("users3", UserSchema); //users 테이블에 UserSchema를 적용해라
 
     console.log("UserModel 정의함.");
   });
@@ -82,12 +90,12 @@ function connectDB() {
   database.on("error", console.error.bind(console, "몽구스 모듈 에러")); //이렇게 한줄로 써줄수도있다.
 
   //app객체에 database라고 하는걸 속성으로 넣어줄수있음
-  app.set("database", database);
 
-  database.on("disconnected", function () {
-    console.log("DB연결이 끊겼습니다 5초후 재연결 합니다.");
-    setInterval(connectDB(), 5000); //디비연결이 끊기면 5초마다 다시 연결하는 함수를 실행
-  });
+// -----------------------------이건 나중에 다시 보고 고쳐야됨 ---------------------------
+//   database.on("disconnected", function () {
+//     console.log("DB연결이 끊겼습니다 5초후 재연결 합니다.");
+//     setInterval(connectDB(), 5000); //디비연결이 끊기면 5초마다 다시 연결하는 함수를 실행
+//   });
 }
 
 function createUserSchema(database) {
@@ -130,26 +138,7 @@ var addUser = function (database, id, pwd, name, callback) {
   console.log("addUser 함수 호출");
 
   var users = new UserModel({ id: id, password: pwd, name: name });
-  // console.log(users);
-  // console.dir(users);
-  // users.save(function(err,result){
 
-  // 	if(err){
-  // 		callback(err,null);
-  // 		return;
-  // 	}
-
-  // 	if(result){
-
-  // 		console.log("사용자 추가~");
-
-  // 	}else{
-
-  // 		console.log("사용자 추가 실패 ㅠ-ㅠ");
-  // 	}
-
-  // 	callback(null,result);
-  // });
 
   users
     .save()
@@ -185,11 +174,11 @@ app.use("/", router);
 var errorHandler = expressErrorHandler({
   static: {
     //미리 메모리상에 올려둔것
-    404: "./public/404.html", //404에러가 뜨면 public에 404.html로 가라
+    404: "./DatabaseExample/public/404.html", //404에러가 뜨면 public에 404.html로 가라
   },
 });
 
-app.use(httpError(404));
+app.use(expressErrorHandler.httpError(404));
 app.use(errorHandler); //변수명 담아줌
 
 //Express 서버 시작
@@ -203,3 +192,5 @@ createServer(app).listen(app.get("port"), function () {
   //DB연결 함수 호출
   connectDB();
 });
+app.set("database", database);
+

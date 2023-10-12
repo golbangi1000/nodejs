@@ -1,4 +1,29 @@
-
+var authUser = function (database, id, password, callback) {
+	console.log("authuser 함수 호출");
+  
+	//--------------------schema static
+	UserModel.findById(id).then((result) => {
+	  if (result.length > 0) {
+		var user = new UserModel({ id: id });
+		var authenticated = user.authenticate(
+		  password,
+		  result[0]._doc.salt,
+		  result[0]._doc.hashed_password
+		);
+  
+		if (authenticated) {
+		  console.log("비밀번호 일치함 성공");
+		  callback(null, result);
+		} else {
+		  console.log("비밀번호 일치하지않음 실패");
+		  callback(null, null);
+		}
+	  } else {
+		console.log("아이디 일치하는 사용자 없음");
+		callback(null, null);
+	  }
+	});
+  };
 
 const login = function(req,res){
 
