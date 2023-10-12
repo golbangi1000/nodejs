@@ -1,12 +1,15 @@
 //Express 기본 모듈
-require("dotenv").config();
+// require("dotenv").config();
+import dotenv from 'dotenv';
+dotenv.config();
 import express, { urlencoded, Router } from "express";
 import { createServer } from "http";
 import { join } from "path";
 //var bodyParser = require("body-parser"); //예전에는 bodyParser를 호출해야 했지만 express에 내장이 되어 안써도 괜춘
 import serveStatic from "serve-static"; //특정 폴더를 패스로 접근 가능하게 하는것.
 
-import expressErrorHandler, { httpError } from "express-error-handler";
+import expressErrorHandler from "express-error-handler";
+
 
 //-----------------------암호화 모듈-------------------------------------------
 import crypto from "crypto";
@@ -20,11 +23,11 @@ import * as user1 from "./routes/user.js";
 //var MongoClient = require("mongodb").MongoClient; 몽구스모듈을 쓰면 이렇게 할 필요 없어서 여긴 주석
 
 //mongoose 모듈
-import { connect, connection, model } from "mongoose";
+// import { connect, connection, model } from "mongoose";
 import mongoose from "mongoose";
-import { authenticate } from "passport";
+// import { authenticate } from "passport";
 
-import userSchema from "./database/user_schema";
+import userSchema from "./database/user_schema.js";
 
 //데이터베이스 객체를 위한 변수
 var database; //==connection conn; 과 같음
@@ -59,9 +62,9 @@ function connectDB() {
   var databaseUrl = "mongodb://127.0.0.1:27017/local";
 
   //연결
-  connect(databaseUrl); //몽고DB의 정보를 몽구스모듈과 연결해준다.
+  mongoose.connect(databaseUrl); //몽고DB의 정보를 몽구스모듈과 연결해준다.
 
-  database = connection;
+  database = mongoose.connection;
 
   database.on("open", function () {
     //open이라는 내장이벤트 db가 열려있냐
