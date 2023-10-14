@@ -79,7 +79,7 @@ function connectDB() {
 
     console.log(" 데이터베이스가 연결 되었습니다: " + databaseUrl); //여기까지왔으면 DB연결 성공
 
-    createUserSchema(database);
+    UserSchema = createUserSchema(database);
     //Model 정의 - 스키마를 정의했으면 Model를 정의해야 함
     UserModel = mongoose.model("users3", UserSchema); //users 테이블에 UserSchema를 적용해라
 
@@ -96,12 +96,14 @@ function connectDB() {
 //     console.log("DB연결이 끊겼습니다 5초후 재연결 합니다.");
 //     setInterval(connectDB(), 5000); //디비연결이 끊기면 5초마다 다시 연결하는 함수를 실행
 //   });
+app.set("database", database);
+
 }
 
 function createUserSchema(database) {
   database.UserSchema = userSchema.createSchema(mongoose);
 
-  database.UserModel = mongoose.model("users3", database.UserSchema);
+  UserModel = mongoose.model("users3", database.UserSchema);
   console.log("userMOdel 정의함");
 }
 //작업하는 함수를 만들고 그걸 불러쓰는 라우터를 만듬.
@@ -192,5 +194,4 @@ createServer(app).listen(app.get("port"), function () {
   //DB연결 함수 호출
   connectDB();
 });
-app.set("database", database);
 
