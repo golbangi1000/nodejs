@@ -1,4 +1,6 @@
-import crypto from "crypto";
+// import crypto from "crypto";
+
+const crypto = require('crypto');
 
 var Schema = {};
 
@@ -73,4 +75,4 @@ Schema.createSchema = function (mongoose) {
   return UserSchema;
 };
 
-export default Schema;
+module.exports = Schema;

@@ -9,6 +9,7 @@ var path = require("path");
 var serveStatic = require("serve-static"); //특정 폴더를 패스로 접근 가능하게 하는것.
 
 
+
 var expressErrorHandler = require("express-error-handler");
 
 //-----------------------암호화 모듈-------------------------------------------
@@ -27,7 +28,7 @@ var mongoose = require("mongoose");
 const { authenticate } = require("passport");
 
 //데이터베이스 객체를 위한 변수
-var database; //==connection conn; 과 같음
+var database; //==ion conn; 과 같음
 
 //데이터베이스 스키마를 위한 변수
 var UserSchema;
@@ -36,15 +37,15 @@ var UserSchema;
 var UserModel;
 
 //데이터베이스 연결
-function connectDB(){
+function DB(){
 
 	//데이터베이스 연결 정보
 	var databaseUrl = 'mongodb://127.0.0.1:27017/local';
 
 	//연결
-	mongoose.connect(databaseUrl); //몽고DB의 정보를 몽구스모듈과 연결해준다.
+	mongoose.(databaseUrl); //몽고DB의 정보를 몽구스모듈과 연결해준다.
 	
-	database = mongoose.connection;
+	database = mongoose.ion;
 	
 	database.on("open",function(){//open이라는 내장이벤트 db가 열려있냐
 		
@@ -136,10 +137,10 @@ function connectDB(){
 						//function자리에 한번에써준것.
 	database.on("error",console.error.bind(console,"몽구스 모듈 에러")); //이렇게 한줄로 써줄수도있다.
 									
-	database.on("disconnected",function(){
+	database.on("dised",function(){
 		
 		console.log("DB연결이 끊겼습니다 5초후 재연결 합니다.");
-		setInterval(connectDB(),5000); //디비연결이 끊기면 5초마다 다시 연결하는 함수를 실행
+		setInterval(DB(),5000); //디비연결이 끊기면 5초마다 다시 연결하는 함수를 실행
 	});
 }
 
@@ -468,6 +469,6 @@ http.createServer(app).listen(app.get("port"),function(){ //위에 set으로 넣
 	console.log("익스프레스 서버 on~~ 포트번호는:" + app.get("port"));
 
 	//DB연결 함수 호출
-	connectDB(); 
+	DB(); 
 
 });

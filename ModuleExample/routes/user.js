@@ -171,5 +171,9 @@ const listUser = function(req,res){
 
 }
 
-export {login,addUser,listUser};
+module.exports ={
+	login,
+	addUser,
+	listUser
+};
 
