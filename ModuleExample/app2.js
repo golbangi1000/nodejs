@@ -59,6 +59,9 @@ const fileURLToPath = require('url');
 
 const database_loader = require('./database/database_loader.js');
 
+const router_loader = require('./routes/route_loader.js');
+const route_loader = require('./routes/route_loader.js');
+
 // const __dirname1 = fileURLToPath(new URL(".", import.meta.url));
 //데이터베이스 객체를 위한 변수
 var database; //==connection conn; 과 같음
@@ -190,16 +193,18 @@ var addUser = function (database, id, pwd, name, callback) {
 
 //-----------------------------------------------------------------------------
 //라우터 객체 생성
-var router = Router();
+route_loader.init(app, express.Router());
+// var router = express.Router();
 
-router.route("/process/listuser").post(user1.listUser);
-//로그인 라우터
-router.route("/process/login").post(user1.login);
+// router.route("/process/listuser").post(user1.listUser);
+// //로그인 라우터
+// router.route("/process/login").post(user1.login);
 
-router.route("/process/addUser").post(user1.addUser);
+// router.route("/process/addUser").post(user1.addUser);
+
 
 //라우터 객체 등록
-app.use("/", router);
+// app.use("/", Router);
 
 var errorHandler = expressErrorHandler({
   static: {

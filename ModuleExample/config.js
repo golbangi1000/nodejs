@@ -6,8 +6,8 @@ const db_schemas = [
 ];
 const route_info = [
     {file: './user', path : '/process/login', method: 'login', type:'post' },
-    {file: './user', path : '/process/adduser', method: 'adduser', type:'post' },
-    {file: './user', path : '/process/listuser', method: 'listuser', type:'post' },
+    {file: './user', path : '/process/adduser', method: 'addUser', type:'post' },
+    {file: './user', path : '/process/listuser', method: 'listUser', type:'post' },
 
 ];
 
