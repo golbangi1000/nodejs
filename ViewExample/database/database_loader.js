@@ -20,7 +20,7 @@ function connect (app, config){
   
       console.log(" 데이터베이스가 연결 되었습니다: " + databaseUrl); //여기까지왔으면 DB연결 성공
   
-      UserSchema = createUserSchema(database);
+      UserSchema = createSchema(database);
       //Model 정의 - 스키마를 정의했으면 Model를 정의해야 함
       UserModel = mongoose.model("users3", UserSchema); //users 테이블에 UserSchema를 적용해라
   

@@ -5,7 +5,7 @@ let dotenv = require('dotenv');
 dotenv.config();
 // import express from "express";
 const express = require('express');
-const Router = express.Router;
+const router1 = express.Router;
 const urlencoded = express.urlencoded;
 // import  http from "http";
 const http = require('http');
@@ -96,50 +96,6 @@ app.use(
   })
 );
 
-//데이터베이스 연결
-// function connectDB() {
-//   //데이터베이스 연결 정보
-//   var databaseUrl = config.db_url;
-
-//   //연결
-//   mongoose.connect(config.db_url)
-//   .then(() => console.log('connected')) //몽고DB의 정보를 몽구스모듈과 연결해준다.
-
-
-  // database = mongoose.connection;
-
-  // database.on("open", function () {
-  //   //open이라는 내장이벤트 db가 열려있냐
-
-  //   console.log(" 데이터베이스가 연결 되었습니다: " + databaseUrl); //여기까지왔으면 DB연결 성공
-
-  //   UserSchema = createUserSchema(database);
-  //   //Model 정의 - 스키마를 정의했으면 Model를 정의해야 함
-  //   UserModel = mongoose.model("users3", UserSchema); //users 테이블에 UserSchema를 적용해라
-
-  //   console.log("UserModel 정의함.");
-  // });
-
-  // //function자리에 한번에써준것.
-  // database.on("error", console.error.bind(console, "몽구스 모듈 에러")); //이렇게 한줄로 써줄수도있다.
-
-  //app객체에 database라고 하는걸 속성으로 넣어줄수있음
-
-// -----------------------------이건 나중에 다시 보고 고쳐야됨 ---------------------------
-//   database.on("disconnected", function () {
-//     console.log("DB연결이 끊겼습니다 5초후 재연결 합니다.");
-//     setInterval(connectDB(), 5000); //디비연결이 끊기면 5초마다 다시 연결하는 함수를 실행
-//   });
-// app.set("database", database);
-
-// }
-
-// function createUserSchema(database) {
-//   database.UserSchema = userSchema.createSchema(mongoose);
-
-//   UserModel = mongoose.model("users3", database.UserSchema);
-//   console.log("userMOdel 정의함");
-// }
 //작업하는 함수를 만들고 그걸 불러쓰는 라우터를 만듬.
 //사용자를 인증하는 함수
 var authUser = function (database, id, password, callback) {
@@ -201,7 +157,7 @@ route_loader.init(app, express.Router());
 
 // router.route("/process/listuser").post(user1.listUser);
 // //로그인 라우터
-// router.route("/process/login").post(user1.login);
+// router1.route("/process/login").post(user1.login);
 
 // router.route("/process/addUser").post(user1.addUser);
 

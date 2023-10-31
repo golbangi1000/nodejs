@@ -152,23 +152,31 @@ const listUser = function(req,res){
                 res.end();
                 return;
             }
+						if(results){ //데이터가 있으면
+			
+							var userName = results[0].name;//위에서 데이터를 배열로 받기로 했슴
+							
+							res.writeHead(200,{"Content-Type":"text/html;charset=utf8"});
+							const context = {
+								results: results
+							};
+							req.app.render('listuser',context , function(err, html){
+								if(err){
+									console.error('뷰렌더링 중 에러 발생 : ' + err.stack)
+									console.log('에러발생')
+									res.writeHead(200,{"Content-Type":"text/html;charset=utf8"});
+									res.write('<h1>사용자 데이터 조회 안됨 <h1>')
+			
+									res.end;
+			
+									return;
+								}
+								res.writeHead(200,{"Content-Type":"text/html;charset=utf8"});
 
-            if(results){
-                console.dir(results);
-
-                res.writeHead(  200, {"Content-type:": "text/html;charset=utf8"})
-                res.write("<h3>사용자 리스트</h3>")
-                res.write("<div><ul>");
-
-                for(var i = 0; i < results.length; i++){
-                    var curId = results[i]._doc.id;
-                    var curName = results[i]._doc.name;
-                    res.write(" <li>#" + i + " -> " + curId + ", " + curName+ "</li>" )
-
-                }
-
-                res.write("</ul></div>")
-                res.end();
+								res.end(html);
+			
+							});
+						
             } else {
                 console.log('에러발생')
                 res.writeHead(200, {"Content-Type":"text/html;charset=utf8"});
