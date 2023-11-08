@@ -249,9 +249,30 @@ passport.deserializeUser(function(user, done){
   done(null, user);
 })
 //라우터 객체 생성
-route_loader.init(app, express.Router());
+const router = express.Router();
+route_loader.init(app, router);
+
+//=============회원가입과 로그인 라우팅 함수====================
+router.route('/').get(function(req, res){
+  console.log('/ path로 요청됨 ')
+
+  res.render('index.ejs')
+});
+
+router.route('/login').get(function(req,res){
+  console.log('/login path로 요청됨')
+
+  res.render('login.ejs', {message: req.flash('loginMessage')});
 
 
+});
+
+router.route('/login').post(passport.authenticate('local-login',{
+  successRedirect: '/profile',
+  failureRedirect: '/login',
+  failureFlash: true
+}
+))
 
 
 var errorHandler = expressErrorHandler({
