@@ -27,5 +27,6 @@ passport.use('local-login', local_login);
 
 
 passport.use('local-signup', local_signup);
-
+ 
+console.log('passport strategy 등록됨')
 }

@@ -62,6 +62,14 @@ const passport = require('passport');
 const flash = require('connect-flash');
 
 
+// ====================socket io and cors==============
+
+const socketio = require('socket.io');
+const cors = require('cors');
+
+
+
+
 // const __dirname1 = fileURLToPath(new URL(".", import.meta.url));
 //데이터베이스 객체를 위한 변수
 var database; //==connection conn; 과 같음
@@ -152,6 +160,9 @@ var addUser = function (database, id, pwd, name, callback) {
 
 //-----------------------------------------------------------------------------
 
+//=============cors 초기화 ===================
+app.use(cors());
+
 
 //----------passport 초기화 ---------------------
 //express서버에 middleware 등록 
@@ -159,100 +170,22 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 
+const configPassport  = require('./config/passport');
 
-// =============패스포트 strategy 설정 ===================
+const userPassport = require('./routes/user_passport')
+
+userPassport(router , passport);
+
+
 const localStrategy = require('passport-local').Strategy;
 
-passport.use('local-login');
 
 
-passport.use('local-signup');
 
-
-passport.serializeUser( function(user, done){
-  console.log('serializeUser 호출됨');
-  console.dir(user);
-
-  done(null,user);
-});
-
-
-passport.deserializeUser(function(user, done){
-  console.log('deserializeUser 호출됨, ');
-  console.log(user);
-
-  done(null, user);
-})
 //라우터 객체 생성
 const router = express.Router();
 route_loader.init(app, router);
 
-//=============회원가입과 로그인 라우팅 함수====================
-router.route('/').get(function(req, res){
-  console.log('/ path로 요청됨 ')
-
-  res.render('index.ejs')
-});
-
-router.route('/login').get(function(req,res){
-  console.log('/login path로 요청됨')
-
-  res.render('login.ejs', {message: req.flash('loginMessage')});
-
-
-});
-
-router.route('/login').post(passport.authenticate('local-login',{
-  successRedirect: '/profile',
-  failureRedirect: '/login',
-  failureFlash: true
-}));
-
-router.route('/signup', function(req,res){
-  console.log('/signup 패스로 GET 요청됨');
-
-  res.render('signup.ejs' ,{message: req.flash('signupmessage')})
-});
-
-
-router.route('/signup').post(passport.authenticate('local-signup',{
-  successRedirect: '/profile',
-  failureRedirect: '/login',
-  failureFlash: true
-}))
-
-
-router.route('/profile').get(function(req,res){
-  console.log('/profile 패스로 GET 요청됨.');
-
-  console.log('req.user 객체 정보 ');
-
-  console.dir(req.user);
-
-  if(!req.user){
-    console.log('사용자 인증 안된 상태임');
-    res.redirect('/');
-
-  } else{
-    console.log('사용자 인증된 상태임');
-
-    if(Array.isArray(req.user)){
-      res.render('profile.ejs', {user:req.user[0]._doc})
-
-    } else{
-      res.render('profile.ejs', {user: req.user});
-    }
-
-  }
-});
-
-router.route('/logout').get(function(req,res){
-  console.log('/logout 호출됨');
-
-  req.logout();
-  res.redirect('/');
-
-})
 
 
 
@@ -277,5 +210,13 @@ createServer(app).listen(app.get("port"), function () {
 
   //DB연결 함수 호출
   database_loader.database.init(app, config);
+});
+
+//=========socket.io서버 시작==============
+const io = socketio.listen(server);
+console.log('socketio 요청을 받아들일 준비가 완료됨')
+
+io.sockets.on('connection', function(socket){
+  console.log('connection info-> '+ socket.request.connection._peername);
 });
 
