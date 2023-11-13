@@ -5,7 +5,7 @@ let dotenv = require('dotenv');
 dotenv.config();
 // import express from "express";
 const express = require('express');
-const Router = express.Router;
+const router1 = express.Router;
 const urlencoded = express.urlencoded;
 // import  http from "http";
 const http = require('http');
@@ -17,7 +17,7 @@ const path = require('path');
 
 
 // import * as config from './config.js';
-const config = require('./config.js')
+const config = require('./config/config.js')
 
 
 //var bodyParser = require("body-parser"); //예전에는 bodyParser를 호출해야 했지만 express에 내장이 되어 안써도 괜춘
@@ -39,12 +39,6 @@ const expressSession = require('express-session');
 
 const user1 = require('./routes/user.js');
 
-//몽고디비 모듈
-//var MongoClient = require("mongodb").MongoClient; 몽구스모듈을 쓰면 이렇게 할 필요 없어서 여긴 주석
-
-//mongoose 모듈
-// import { connect, connection, model } from "mongoose";
-
 
 const mongoose = require('mongoose');
 
@@ -54,13 +48,27 @@ const mongoose = require('mongoose');
 const userSchema = require('./database/user_schema.js')
 
 
-// import { fileURLToPath } from "url";
 const fileURLToPath = require('url');
 
 const database_loader = require('./database/database_loader.js');
 
 const router_loader = require('./routes/route_loader.js');
 const route_loader = require('./routes/route_loader.js');
+
+
+/// -------------------passport---------------------
+
+const passport = require('passport');
+const flash = require('connect-flash');
+
+
+// ====================socket io and cors==============
+
+const socketio = require('socket.io');
+const cors = require('cors');
+
+
+
 
 // const __dirname1 = fileURLToPath(new URL(".", import.meta.url));
 //데이터베이스 객체를 위한 변수
@@ -74,6 +82,9 @@ var UserModel;
 
 //익스프레스 객체 생성
 var app = express()
+
+app.set('views', __dirname+'/views');
+app.set('view engine', 'ejs');
 
 console.log('config.server_port ->' + config.server_port)
 app.set("port", config.server_port || 3000);
@@ -93,50 +104,6 @@ app.use(
   })
 );
 
-//데이터베이스 연결
-// function connectDB() {
-//   //데이터베이스 연결 정보
-//   var databaseUrl = config.db_url;
-
-//   //연결
-//   mongoose.connect(config.db_url)
-//   .then(() => console.log('connected')) //몽고DB의 정보를 몽구스모듈과 연결해준다.
-
-
-  // database = mongoose.connection;
-
-  // database.on("open", function () {
-  //   //open이라는 내장이벤트 db가 열려있냐
-
-  //   console.log(" 데이터베이스가 연결 되었습니다: " + databaseUrl); //여기까지왔으면 DB연결 성공
-
-  //   UserSchema = createUserSchema(database);
-  //   //Model 정의 - 스키마를 정의했으면 Model를 정의해야 함
-  //   UserModel = mongoose.model("users3", UserSchema); //users 테이블에 UserSchema를 적용해라
-
-  //   console.log("UserModel 정의함.");
-  // });
-
-  // //function자리에 한번에써준것.
-  // database.on("error", console.error.bind(console, "몽구스 모듈 에러")); //이렇게 한줄로 써줄수도있다.
-
-  //app객체에 database라고 하는걸 속성으로 넣어줄수있음
-
-// -----------------------------이건 나중에 다시 보고 고쳐야됨 ---------------------------
-//   database.on("disconnected", function () {
-//     console.log("DB연결이 끊겼습니다 5초후 재연결 합니다.");
-//     setInterval(connectDB(), 5000); //디비연결이 끊기면 5초마다 다시 연결하는 함수를 실행
-//   });
-// app.set("database", database);
-
-// }
-
-// function createUserSchema(database) {
-//   database.UserSchema = userSchema.createSchema(mongoose);
-
-//   UserModel = mongoose.model("users3", database.UserSchema);
-//   console.log("userMOdel 정의함");
-// }
 //작업하는 함수를 만들고 그걸 불러쓰는 라우터를 만듬.
 //사용자를 인증하는 함수
 var authUser = function (database, id, password, callback) {
@@ -192,19 +159,36 @@ var addUser = function (database, id, pwd, name, callback) {
 };
 
 //-----------------------------------------------------------------------------
+
+//=============cors 초기화 ===================
+app.use(cors());
+
+
+//----------passport 초기화 ---------------------
+//express서버에 middleware 등록 
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(flash());
+
+const configPassport  = require('./config/passport');
+
+const userPassport = require('./routes/user_passport')
+
+userPassport(router , passport);
+
+
+const localStrategy = require('passport-local').Strategy;
+
+
+
+
 //라우터 객체 생성
-route_loader.init(app, express.Router());
-// var router = express.Router();
-
-// router.route("/process/listuser").post(user1.listUser);
-// //로그인 라우터
-// router.route("/process/login").post(user1.login);
-
-// router.route("/process/addUser").post(user1.addUser);
+const router = express.Router();
+route_loader.init(app, router);
 
 
-//라우터 객체 등록
-// app.use("/", Router);
+
+
 
 var errorHandler = expressErrorHandler({
   static: {
@@ -226,5 +210,30 @@ createServer(app).listen(app.get("port"), function () {
 
   //DB연결 함수 호출
   database_loader.database.init(app, config);
+});
+
+//=========socket.io서버 시작==============
+const io = socketio.listen(server);
+console.log('socketio 요청을 받아들일 준비가 완료됨')
+
+io.sockets.on('connection', function(socket){
+  console.log('connection info-> '+ socket.request.connection._peername);
+
+  socket.remoteAddress = socket.request.connection._peername.address;
+  socket.remotePort = socket.request.connection._peername.port;
+  
+
+  socket.on('message', function(message){
+    console.log('message 받음 -> ' + JSON.stringify(message));
+  
+    if (message.recepient == 'ALL'){
+      console.log('모든 클라이언트에게 메세지 전송함');
+
+      io.sockets.emit('message',message);
+    }
+  });
+
+
+
 });
 

@@ -218,5 +218,9 @@ console.log('socketio 요청을 받아들일 준비가 완료됨')
 
 io.sockets.on('connection', function(socket){
   console.log('connection info-> '+ socket.request.connection._peername);
+
+  socket.remoteAddress = socket.request.connection._peername.address;
+  socket.remotePort = socket.request.connection._peername.port;
+  
 });
 

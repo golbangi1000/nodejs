@@ -1,7 +1,7 @@
 
 
 
-export default function (router,passport){
+module.exports = function (router,passport){
     console.log('user_passport 호출됨');
 
 
