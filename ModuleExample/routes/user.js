@@ -125,7 +125,7 @@ const addUser = function(req,res){
 
 
 const listUser = function(req,res){
-    console.log('/process/listure 라우팅함수 호출됨');
+    console.log('/process/listuser 라우팅함수 호출됨');
     const database  = req.app.get('database');
 
 	//집에서 해보기
@@ -171,5 +171,9 @@ const listUser = function(req,res){
 
 }
 
-export {login,addUser,listUser};
+module.exports ={
+	login,
+	addUser,
+	listUser
+};
 
