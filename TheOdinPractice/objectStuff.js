@@ -11,3 +11,4 @@ console.log(circle);
 
 delete circle.color;
 console.log(circle);
+console.log("awegawe");

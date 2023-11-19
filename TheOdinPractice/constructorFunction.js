@@ -8,6 +8,11 @@ function Circle(radius) {
    return this; //don't have to put it explicitly.
 }
 
-const circle = new Circle(3);
 //create a new empty object
 // this
+
+Circle.call({}, 1);
+Circle.apply({}, [1, 2, 3]);
+
+circle1 = new Circle1(1);
+console.log(circle1);
