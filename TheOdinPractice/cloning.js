@@ -19,3 +19,7 @@ const circle = {
 const another = { ...circle }; //takes all the properties and methods in the object best way to clone an object
 
 console.log(another);
+
+console.log("-=========================");
+
+//Math
