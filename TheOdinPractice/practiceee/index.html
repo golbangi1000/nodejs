@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Document</title>
+      <link rel="stylesheet" href="main.css" />
+   </head>
+   <body>
+      <div class="alert-box" id="alert">
+         <p id="IdPW">ID pls</p>
+
+         <button onclick="document.getElementById('alert').style.display = 'none';">Hide</button>
+      </div>
+
+      <button onclick="displayIdPw('block','ID PLS')">ID</button>
+      <button onclick="displayIdPw('block', 'PW PLS')">PW</button>
+
+      <script>
+         function displayIdPw(display, text) {
+            document.getElementById("alert").style.display = display;
+            document.getElementById("IdPW").innerHTML = text;
+         }
+      </script>
+   </body>
+</html>
