@@ -342,5 +342,6 @@ createServer(app).listen(app.get("port"), function () {
 
   //DB연결 함수 호출
   database_loader.database.init(app, config);
+  
 });
 
