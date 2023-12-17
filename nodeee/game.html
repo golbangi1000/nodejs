@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Info Website</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+
+<body>
+    <header>
+        <h1>Game Info Central</h1>
+        <nav>
+            <ul>
+                <li><a href="#games">Games</a></li>
+                <li><a href="#news">News</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div class="search-container">
+                <input type="text" placeholder="Search games..." id="searchInput">
+                <button onclick="searchGames()">Search</button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="games">
+            <h2>Featured Games</h2>
+            <!-- Game entries go here -->
+        </section>
+
+        <section id="news">
+            <h2>Latest News</h2>
+            <!-- News entries go here -->
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Game Info Central</p>
+    </footer>
+
+
+    <script>
+        function searchGames() {
+            var searchText = document.getElementById('searchInput').value;
+            console.log("Searching for:", searchText);
+            // Implement search functionality here
+        }
+    </script>
+
+</body>
+
+
+</html>
