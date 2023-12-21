@@ -1,40 +1,21 @@
-nav {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 0 10px;
-}
-
-nav ul {
-	display: flex;
-	list-style-type: none;
-	padding: 0;
-}
-
-nav ul li {
-	margin-right: 20px;
-}
-
-.search-container {
-	display: flex;
-}
-
-.search-container input[type="text"] {
-	padding: 5px;
-	margin-right: 10px;
-	border: 1px solid #ccc;
+.grey-bg {
+	background: #eee;
+  }
+  .white-bg {
+	background: white;
+	margin: 20px;
 	border-radius: 5px;
-}
-
-.search-container button {
-	padding: 5px 10px;
-	background-color: #333;
-	color: white;
-	border: none;
-	border-radius: 5px;
-	cursor: pointer;
-}
-
-.search-container button:hover {
-	background-color: #555;
-}
+  }
+  .list-box {
+	padding : 10px;
+	border-bottom: 1px solid#eee;
+  }
+  .list-box h4{
+	font-size: 16px;
+	margin: 5px;
+  }
+  .list-box p {
+	font-size: 13px;
+	margin: 5px;
+	color: grey;
+  }
