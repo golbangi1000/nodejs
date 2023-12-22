@@ -15,43 +15,43 @@ const PORT = parseFloat(PORT1);
 let db;
 const url = MONGO_URL;
 new MongoClient(url)
-	.connect()
-	.then((client) => {
-		console.log("DB연결성공");
+   .connect()
+   .then((client) => {
+      console.log("DB연결성공");
 
-		db = client.db("forum");
-	})
-	.catch((err) => {
-		console.log("mongodb connection error" + ":" + err);
-	});
+      db = client.db("forum");
+   })
+   .catch((err) => {
+      console.log("mongodb connection error" + ":" + err);
+   });
 
 app.listen(PORT, () => {
-	console.log(8080 + "서버 실행중");
+   console.log(8080 + "서버 실행중");
 });
 
 app.get("/", (req, res) => {
-	res.sendFile(__dirname + "/index.html");
+   res.sendFile(__dirname + "/index.html");
 });
 
 app.get("/game", (req, res) => {
-	res.sendFile(__dirname + "/game.html");
+   res.sendFile(__dirname + "/game.html");
 });
 
 app.get("/write", (req, res) => {
-	res.render("write.ejs");
+   res.render("write.ejs");
 });
 
 app.post("/add", (req, res) => {
-	console.log(req.body);
-	console.log(typeof req.body);
-	db.collection("post").insertOne(req.body);
+   console.log(req.body);
+   console.log(typeof req.body);
+   db.collection("post").insertOne(req.body);
 });
 
 app.get("/list", async (req, res) => {
-	let documentResult = await db.collection("post").find().toArray(); //wait till it finishes
+   let documentResult = await db.collection("post").find().toArray(); //wait till it finishes
 
-	console.log(documentResult);
-	res.render("list.ejs", { posts: documentResult });
+   console.log(documentResult);
+   res.render("list.ejs", { posts: documentResult });
 });
 
 //how to write a user post function
