@@ -41,10 +41,10 @@ app.get("/write", (req, res) => {
    res.render("write.ejs");
 });
 
-app.post("/add", (req, res) => {
-   console.log(req.body);
-   console.log(typeof req.body);
-   db.collection("post").insertOne(req.body);
+app.post("/add", async (req, res) => {
+   // await db.collection("post").insertOne(req.body);
+   await db.collection("post").insertOne({ title: req.body.title, content: req.body.content });
+   res.redirect("/list");
 });
 
 app.get("/list", async (req, res) => {
