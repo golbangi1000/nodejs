@@ -64,3 +64,6 @@ div {
 	padding: 15px;
 	margin-top: 10px;
 }
+.hyperlink {
+	color: inherit;
+}
