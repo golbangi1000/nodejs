@@ -67,3 +67,24 @@ div {
 .hyperlink {
 	color: inherit;
 }
+.edit {
+	display: inline;
+}
+.delete{
+	display: inline;
+}
+a {
+	color: green;         /* Change the text color */
+	text-decoration: none; /* Remove the underline */
+	font-weight: bold;     /* Make the text bold */
+}
+
+/* Style for <a> tags on hover */
+a:hover {
+	color: orange;        /* Change the text color on hover */
+	text-decoration: underline; /* Add underline on hover */
+}
+.delete:hover {
+	color: orange;        /* Change the text color on hover */
+	text-decoration: underline; /* Add underline on hover */
+}
