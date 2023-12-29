@@ -4,6 +4,22 @@ const { ObjectId, MongoClient, TopologyDescription } = require("mongodb");
 require("dotenv").config();
 const app = express();
 
+const session = require("express-session");
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+
+app.use(passport.initialize());
+app.use(
+	session({
+		secret: "암호화에 쓸 비번",
+		resave: false,
+		saveUninitialized: false,
+		cookie: { maxAge: 60 * 1000 },
+	})
+);
+
+app.use(passport.session());
+
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public")); //css js jpg (static files)
 
@@ -140,21 +156,36 @@ passport.use(
 	})
 );
 
+//serializeUser
+passport.serializeUser((user, done) => {
+	console.log(user);
+	process.nextTick(() => {
+		done(null, { id: user._id, username: user.username });
+	});
+});
+
+passport.deserializeUser(async (user, done) => {
+	let result = await db
+		.collection("user")
+		.findOne({ _id: new ObjectId(user.id) });
+	delete result.password;
+	process.nextTick(() => {
+		done(null, result);
+	});
+});
+
 app.get("/login", async (req, res) => {
-	// await db.collection("post").insertOne(req.body);
-	await db
-		.collection("post")
-		.insertOne({ title: req.body.title, content: req.body.content });
+	console.log(req.user);
 	res.render("login.ejs");
 });
 
 app.post("/login", async (req, res, next) => {
 	passport.authenticate("local", (error, user, info) => {
 		if (error) {
-			return res.status(500).json(error);
+			return res.status(500).json(error + "에러");
 		}
 		if (!user) {
-			return res.status(400).json(info.message);
+			return res.status(400).json(info.message + "!user일떄");
 		}
 
 		req.login(user, (err) => {
@@ -164,6 +195,19 @@ app.post("/login", async (req, res, next) => {
 			res.redirect("/");
 		});
 	})(req, res, next);
+});
+
+app.get("/mypage", (req, res) => {
+	try {
+		if (!req.user) {
+			res.write("<script>alert('login please')</script>");
+			res.write('<script>window.location="/list"</script>');
+		} else {
+			res.render("mypage.ejs");
+		}
+	} catch (error) {
+		console.log(error);
+	}
 });
 
 //how to write a user post function
