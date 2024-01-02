@@ -8,13 +8,24 @@ const session = require("express-session");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 
+const bcrypt = require("bcrypt");
+const mongoStore = require("connect-mongo");
+
+const MONGO_URL = process.env.MONGO_URL;
+const PORT1 = process.env.PORT;
+const PORT = parseFloat(PORT1);
+
 app.use(passport.initialize());
 app.use(
    session({
       secret: "암호화에 쓸 비번",
       resave: false,
       saveUninitialized: false,
-      cookie: { maxAge: 60 * 1000 },
+      cookie: { maxAge: 60 * 1000 }, //look up connect-mongo for session related stuff
+      store: mongoStore.create({
+         mongoUrl: MONGO_URL,
+         dbName: "forum",
+      }),
    })
 );
 
@@ -30,9 +41,6 @@ app.use(express.urlencoded({ extended: true }));
 const methodOverride = require("method-override");
 app.use(methodOverride("_method"));
 
-const MONGO_URL = process.env.MONGO_URL;
-const PORT1 = process.env.PORT;
-const PORT = parseFloat(PORT1);
 let db;
 const url = MONGO_URL;
 new MongoClient(url)
@@ -137,12 +145,14 @@ app.get("/list/next/:number", async (req, res) => {
 });
 
 passport.use(
-   new LocalStrategy(async (username1, password1, cb) => {
-      let result = await db.collection("user").findOne({ username: username1 });
+   new LocalStrategy(async (usernameInput, passwordInput, cb) => {
+      let result = await db.collection("user").findOne({ username: usernameInput });
       if (!result) {
          return cb(null, false, { message: "아이디 DB에 없음" });
       }
-      if (result.password == password1) {
+
+      await bcrypt.compare(passwordInput, result.password);
+      if (result.password == passwordInput) {
          return cb(null, result);
       } else {
          return cb(null, false, { message: "비번불일치" });
@@ -202,6 +212,18 @@ app.get("/mypage", (req, res) => {
    }
 });
 
+app.get("/register", (req, res) => {
+   res.render("register.ejs");
+});
+
+app.post("/register", async (req, res) => {
+   let hashResult = await bcrypt.hash(req.body.password, 11);
+   console.log(hashResult);
+
+   await db.collection("user").insertOne({ username: req.body.username, password: hashResult });
+
+   res.render("register.ejs");
+});
 //how to write a user post function
 // write somehting in the page
 // title and content sent to server then to db
