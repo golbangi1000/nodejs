@@ -58,7 +58,16 @@ app.listen(PORT, () => {
 	console.log(8080 + "서버 실행중");
 });
 
-app.get("/", (req, res) => {
+function loginPlz(req, res, next) {
+	if (!req.user) {
+		res.send("로그인하세요");
+	}
+	next(); //
+}
+
+// app.use(loginPlz); //이거 밑에 있는 API들은 loginPlz가 적용됨 이렇게하면
+
+app.get("/", loginPlz, (req, res) => {
 	res.sendFile(__dirname + "/index.html");
 });
 
@@ -78,7 +87,12 @@ app.post("/add", async (req, res) => {
 	res.redirect("/list");
 });
 
-app.get("/list", async (req, res) => {
+function dateConsole(req, res, next) {
+	console.log(new Date());
+	next();
+}
+
+app.get("/list", dateConsole, async (req, res) => {
 	let documentResult = await db.collection("post").find().toArray(); //wait till it finishes
 
 	res.render("list.ejs", { posts: documentResult });
@@ -190,7 +204,19 @@ app.get("/login", async (req, res) => {
 	res.render("login.ejs");
 });
 
-app.post("/login", async (req, res, next) => {
+function checkEmptyInput(req, res, next) {
+	let username = req.body.username;
+	let password = req.body.password;
+	if (username == null || username.length === 0) {
+		res.write("<script>alert('please type something in username')</script>");
+		res.write('<script>window.location="/list"</script>');
+		return res.end();
+	} else {
+		next();
+	}
+}
+
+app.post("/login", checkEmptyInput, async (req, res, next) => {
 	passport.authenticate("local", (error, user, info) => {
 		if (error) {
 			return res.status(500).json(error + "에러");
@@ -213,6 +239,7 @@ app.get("/mypage", (req, res) => {
 		if (!req.user) {
 			res.write("<script>alert('login please')</script>");
 			res.write('<script>window.location="/list"</script>');
+			return res.end();
 		} else {
 			console.log(req.user);
 			res.render("mypage.ejs", { userInfo: req.user });

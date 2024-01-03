@@ -1,0 +1,47 @@
+body {
+	font-family: Arial, sans-serif;
+	margin: 0;
+	padding: 0;
+	background-color: white;
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+}
+
+.header {
+	background-color: black;
+	color: white;
+	text-align: center;
+	padding: 10px 0;
+}
+
+.nav-bar {
+	background-color: blue;
+	color: white;
+	padding: 10px 0;
+	text-align: center;
+}
+
+.nav-bar a {
+	color: white;
+	text-decoration: none;
+	padding: 10px 15px;
+	display: inline-block;
+}
+
+.nav-bar a:hover {
+	background-color: darkblue;
+}
+
+.content {
+	padding: 20px;
+	text-align: center;
+	flex-grow: 1; /* Ensures that the content area expands to fill available space */
+}
+
+.footer {
+	background-color: black;
+	color: white;
+	text-align: center;
+	padding: 10px 0;
+}
