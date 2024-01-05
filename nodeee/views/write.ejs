@@ -10,10 +10,12 @@
 
 <%- include('nav.ejs') -%>
 
-    <form class="form-box" action="/add" method="post">
+    <form class="form-box" action="/add" method="post" enctype="multipart/form-data">
         <h4>글쓰기</h4>
         <input name="title">
         <input name="content">
+        <input type="file" name="img1" accept="image/*">
+        <!-- need to also check in backend to be safe image태그에 multiple속성 넣어주면 여러장 가능-->
         <button type="submit">전송</button>
     </form>
     </body>
