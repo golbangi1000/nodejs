@@ -62,22 +62,21 @@ app.use(express.urlencoded({ extended: true }));
 const methodOverride = require("method-override");
 app.use(methodOverride("_method"));
 
+let connectDB = require("./database.js");
 let db;
-const url = MONGO_URL;
-new MongoClient(url)
-	.connect()
+
+connectDB
 	.then((client) => {
 		console.log("DB연결성공");
 
 		db = client.db("forum");
+		app.listen(PORT, () => {
+			console.log(8080 + "서버 실행중");
+		});
 	})
 	.catch((err) => {
 		console.log("mongodb connection error" + ":" + err);
 	});
-
-app.listen(PORT, () => {
-	console.log(8080 + "서버 실행중");
-});
 
 function loginPlz(req, res, next) {
 	if (!req.user) {
@@ -100,23 +99,32 @@ app.get("/write", (req, res) => {
 	res.render("write.ejs");
 });
 
-app.post("/add", upload.single("img1"), async (req, res) => {
+app.post("/add", async (req, res) => {
 	//when uploding multiple images gotta use array instead of single
 	// Ex. upload('img1', "number of images")
-	console.log(req.file);
-	try {
-		if (req.body.title == "") {
-			res.send("title is empty");
-		} else {
-			await db
-				.collection("post")
-				.insertOne({ title: req.body.title, content: req.body.content });
-			res.redirect("/list");
+
+	upload.single("img1")(req, res, async (error) => {
+		if (error) {
+			return res.send("img upload error");
 		}
-	} catch (error) {
-		console.log(error);
-		res.status(500).send("error!!!");
-	}
+		try {
+			console.log(req.file);
+
+			if (req.body.title == "") {
+				res.send("title is empty");
+			} else {
+				await db.collection("post").insertOne({
+					title: req.body.title,
+					content: req.body.content,
+					img: req.file.location,
+				});
+				res.redirect("/list");
+			}
+		} catch (error) {
+			console.log(error);
+			res.status(500).send("error!!!");
+		}
+	});
 });
 
 function dateConsole(req, res, next) {
@@ -305,3 +313,7 @@ app.post("/register", async (req, res) => {
 //make link to edit page
 //edit stuff title and content
 // redirect to list or somwhere
+
+// require("./routes/shop.js");
+// app.use("/", require("./routes/shop.js")); shop.js에 shop을 써놨을떄
+app.use("/shop", require("./routes/shop.js"));
