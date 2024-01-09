@@ -319,9 +319,30 @@ app.post("/register", async (req, res) => {
 app.use("/shop", require("./routes/shop.js"));
 
 app.get("/search", async (req, res) => {
+	let searchConditions = [
+		{
+			$search: {
+				index: "default1234",
+				autocomplete: {
+					path: "title",
+					query: req.query.val,
+					tokenOrder: "any",
+					fuzzy: {
+						maxEdits: 2,
+						prefixLength: 1,
+						maxExpansions: 256,
+					},
+				},
+				highlight: {
+					path: "title",
+				},
+			},
+		},
+	];
+
 	let documentResult = await db
 		.collection("post")
-		.find({ title: { $regex: req.query.val } })
+		.aggregate(searchConditions)
 		.toArray();
 
 	res.render("search.ejs", { posts: documentResult });
