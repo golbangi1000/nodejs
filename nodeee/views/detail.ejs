@@ -20,6 +20,20 @@
 
             <img src="<%=post.img %>">
         </div>
+
+
+        <!-- Comments Display Section -->
+        <div id="comments-section">
+            <h3>Comments</h3>
+            <!-- Comments will be displayed here -->
+        </div>
+        <div>
+            <form id="comment-form" action="/comment" method="post">
+                <label for="comment">Your Comment:</label>
+                <textarea class="comment" name="comment" rows="3" cols="10"></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+        </div>
 </body>
 
 </html>

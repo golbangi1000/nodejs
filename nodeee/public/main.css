@@ -70,22 +70,22 @@ div {
 .edit {
 	display: inline;
 }
-.delete{
+.delete {
 	display: inline;
 }
 a {
-	color: green;         /* Change the text color */
+	color: green; /* Change the text color */
 	text-decoration: none; /* Remove the underline */
-	font-weight: bold;     /* Make the text bold */
+	font-weight: bold; /* Make the text bold */
 }
 
 /* Style for <a> tags on hover */
 a:hover {
-	color: orange;        /* Change the text color on hover */
+	color: orange; /* Change the text color on hover */
 	text-decoration: underline; /* Add underline on hover */
 }
 .delete:hover {
-	color: orange;        /* Change the text color on hover */
+	color: orange; /* Change the text color on hover */
 	text-decoration: underline; /* Add underline on hover */
 }
 
@@ -93,11 +93,69 @@ a:hover {
 .search {
 	margin-left: 20px;
 	padding: 5px;
-  }
-  .search-send {
+}
+.search-send {
 	padding: 6px 10px;
 	background: lightgray;
 	border: none;
 	border-radius: 5px;
 	vertical-align: middle;
-  } 
+}
+
+/* Comment Form Styles */
+#comment-form {
+	margin: 20px 0;
+	padding: 20px;
+	background-color: #f2f2f2;
+	border-radius: 5px;
+}
+
+#comment-form label {
+	display: block;
+	margin-bottom: 10px;
+	font-weight: bold;
+}
+
+#comment-form textarea {
+	width: 100%;
+	padding: 10px;
+	margin-bottom: 10px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	resize: vertical;
+}
+
+#comment-form button {
+	background-color: #4caf50;
+	color: white;
+	padding: 10px 15px;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+#comment-form button:hover {
+	background-color: #45a049;
+}
+
+/* Comments Display Section Styles */
+#comments-section {
+	margin: 20px 0;
+	padding: 20px;
+	background-color: #f9f9f9;
+	border-radius: 5px;
+}
+
+#comments-section h3 {
+	margin-bottom: 15px;
+}
+
+.comment {
+	/* padding: 10px; */
+	margin-bottom: 10px;
+	background-color: white;
+	/* border: 1px solid #ddd; */
+	border-radius: 4px;
+	width: 100px;
+	height: 60px;
+}
