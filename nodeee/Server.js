@@ -147,6 +147,7 @@ app.get("/detail/:id", async (req, res) => {
 	try {
 		const userID = new ObjectId(req.params.id);
 		const result = await db.collection("post").findOne({ _id: userID });
+
 		res.render("detail.ejs", { post: result });
 	} catch (error) {
 		console.log(error);
@@ -358,7 +359,12 @@ app.get("/search", async (req, res) => {
 // ===comment===
 
 app.post("/comment", async (req, res) => {
-	await db.collection("post").insertOne({
+	await db.collection("comments").insertOne({
 		comment: req.body.comment,
+		writerID: new ObjectId(req.user.id),
+		writerUsername: req.user.username,
+		postID: new ObjectId(req.body.parentId),
 	});
+
+	res.redirect("back");
 });

@@ -23,16 +23,11 @@
 
 
         <!-- Comments Display Section -->
-        <div id="comments-section">
-            <h3>Comments</h3>
-            <!-- Comments will be displayed here -->
-        </div>
-        <div>
-            <form id="comment-form" action="/comment" method="post">
-                <label for="comment">Your Comment:</label>
-                <textarea class="comment" name="comment" rows="3" cols="10"></textarea>
-                <button type="submit">Post Comment</button>
-            </form>
+        <form action="/comment" method="POST">
+            <input name="comment">
+            <input name="parentId" value="<%= post._id %>" style="display: none">
+            <button type="submit">댓글작성</button>
+        </form>
         </div>
 </body>
 
