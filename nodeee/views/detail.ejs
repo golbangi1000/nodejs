@@ -20,9 +20,16 @@
 
             <img src="<%=post.img %>">
         </div>
-
-
         <!-- Comments Display Section -->
+
+        <hr style="margin-top: 60px">
+        <div>
+            <p><strong>
+                    <%= result2[0].writerUsername %>
+                </strong>
+                <%= result2[0].comment %>
+            </p>
+        </div>
         <form action="/comment" method="POST">
             <input name="comment">
             <input name="parentId" value="<%= post._id %>" style="display: none">
