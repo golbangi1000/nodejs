@@ -373,3 +373,45 @@ app.post("/comment", async (req, res) => {
 
 	res.redirect("back");
 });
+
+app.get("/chat/request", async (req, res) => {
+	await db.collection("chatroom").insertOne({
+		member: [req.user._id, new ObjectId(req.query.writerID)],
+		date: new Date(),
+	});
+
+	res.redirect("/chat/list");
+});
+
+app.get("/chat/list", async (req, res) => {
+	let result1 = await db
+		.collection("chatroom")
+		.find({ member: new ObjectId(req.user._id) }) //if user is not logged in it cna't find the result1
+		.toArray();
+
+	res.render("chatlist.ejs", { result: result1 });
+});
+
+app.get("/chat/detail/:id", async (req, res) => {
+	//only
+	const result = await db
+		.collection("chatroom")
+		.findOne({ _id: new ObjectId(req.params.id) });
+
+	// console.log(result); JSON format
+	// handtyped url
+	console.log(result.member[0] + "콘솔");
+	if (!req.user || !req.user._id) {
+		console.log("redirected a user because it was guest");
+		res.write('<script>window.location="/list"</script>');
+		return res.end();
+	}
+	if (
+		result.member[0].equals(req.user._id) ||
+		result.member[1].equals(req.user._id)
+	) {
+		res.render("chatDetail.ejs", { result: result });
+	} else {
+		res.redirect("/list");
+	}
+});
