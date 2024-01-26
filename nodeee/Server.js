@@ -11,6 +11,12 @@ const LocalStrategy = require("passport-local");
 const bcrypt = require("bcrypt");
 const mongoStore = require("connect-mongo");
 
+//socket io
+const { createServer } = require("http");
+const { Server } = require("socket.io");
+const server = createServer(app);
+const io = new Server(server);
+
 const { S3Client } = require("@aws-sdk/client-s3");
 const multer = require("multer");
 const multerS3 = require("multer-s3");
@@ -70,7 +76,7 @@ connectDB
 		console.log("DB연결성공");
 
 		db = client.db("forum");
-		app.listen(PORT, () => {
+		server.listen(PORT, () => {
 			console.log(8080 + "서버 실행중");
 		});
 	})
@@ -414,4 +420,22 @@ app.get("/chat/detail/:id", async (req, res) => {
 	} else {
 		res.redirect("/list");
 	}
+});
+
+io.on("connection", (socket) => {
+	console.log("somebody connected to websocket");
+
+	socket.on("age", (data) => {
+		console.log("유저가 보낸것", data); //event listner
+		io.emit("name", "bobby"); //서버가 모든유저한테 보낼때
+	});
+
+	// socket.join('룸이름') 유저를 룸에 넣는건 서버만 가능
+	socket.on("ask-join", (data) => {
+		socket.join(data);
+	});
+
+	socket.on("message", (data) => {
+		io.to(data.room).emit("broadcast", data.msg);
+	});
 });

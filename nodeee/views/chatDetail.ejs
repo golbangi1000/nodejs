@@ -24,4 +24,32 @@
             </div>
 </body>
 
+
+<script src="https://cdn.jsdelivr.net/npm/socket.io@4.7.2/client-dist/socket.io.min.js"></script>
+<script>
+
+
+
+    const socket = io()
+    // socket.emit('데이터이름', '데이터')
+    socket.emit('ask-join', '1')
+
+    document.querySelector('.chat-button').addEventListener('click', function () {
+        socket.emit('message', { msg: 'hello message', room: 1 })
+    })
+
+    socket.on('name', (data) => {
+        console.log(data)
+    })//데이터 
+
+
+    socket.on('broadcast', (data) => {
+        console.log(data)
+    })
+</script>
+
 </html>
+
+<!--실시간채팅 만들기 
+    
+-->
