@@ -18,10 +18,13 @@
                     <div class="chat-box mine"><span>안녕하세요</span></div>
                 </div>
             </div>
-            <div class="chat-form">
+            <form action="">
                 <input class="chat-input">
-                <button class="chat-button">전송</button>
-            </div>
+                <button class="chat-button" type="button">전송</button>
+            </form>
+            <!-- <div class="chat-form">
+
+            </div> -->
 </body>
 
 
@@ -32,6 +35,7 @@
     socket.emit('ask-join', '1')
 
     document.querySelector('.chat-button').addEventListener('click', function () {
+        console.log('hi button pressed')
         socket.emit('message', { msg: 'hello message', room: 1 })
     })
 
