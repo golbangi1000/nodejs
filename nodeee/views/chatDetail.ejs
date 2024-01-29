@@ -36,15 +36,16 @@
 
     document.querySelector('.chat-button').addEventListener('click', function () {
         console.log('hi button pressed')
-        socket.emit('message', { msg: 'hello message', room: 1 })
+        socket.emit('message', { msg: 'hello message', room: '1' }) // don't forget to put it in as a string 
     })
 
-    socket.on('name', (data) => {
-        console.log(data)
-    })//데이터 
+    // socket.on('name', (data) => {
+    //     console.log(data)
+    // })//데이터 
 
 
     socket.on('broadcast', (data) => {
+        console.log('hello socket.on broadcast')
         console.log(data)
     })
 </script>
