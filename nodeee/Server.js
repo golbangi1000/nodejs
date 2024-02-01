@@ -432,10 +432,11 @@ io.on("connection", (socket) => {
 
 	// socket.join('룸이름') 유저를 룸에 넣는건 서버만 가능
 	socket.on("ask-join", (data) => {
+		// socket.request.session;
 		socket.join(data);
 	});
 
-	socket.on("message", (data) => {
-		io.to(data.room).emit("broadcast", data.msg);
+	socket.on("message-sent", (data) => {
+		io.to(data.room).emit("message-broadcast", data.msg);
 	});
 });

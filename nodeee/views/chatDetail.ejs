@@ -32,11 +32,12 @@
 <script>
     const socket = io()
     // socket.emit('데이터이름', '데이터')
-    socket.emit('ask-join', '1')
+    socket.emit('ask-join', '<%= result._id %>')
 
     document.querySelector('.chat-button').addEventListener('click', function () {
         console.log('hi button pressed')
-        socket.emit('message', { msg: 'hello message', room: '1' }) // don't forget to put it in as a string 
+        let chatInput = document.querySelector('.chat-input').value
+        socket.emit('message-sent', { msg: chatInput, room: '<%= result._id %>' }) // don't forget string '1'
     })
 
     // socket.on('name', (data) => {
@@ -44,9 +45,10 @@
     // })//데이터 
 
 
-    socket.on('broadcast', (data) => {
+    socket.on('message-broadcast', (data) => {
         console.log('hello socket.on broadcast')
         console.log(data)
+        document.querySelector('.chat-screen').insertAdjacentHTML('beforeend', `<div class="chat-box"><span>${data}</span></div>`)
     })
 </script>
 
