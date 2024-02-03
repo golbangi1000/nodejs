@@ -56,6 +56,13 @@
          <% } %>
 
             <a href="/list/next/<%= posts[posts.length-1]._id %>">다음</a>
+
+            <script>
+               let eventSource = new EventSource('/stream/list')
+               eventSource.addEventListener('msg', function (e) {
+                  console.log(e.data)
+               })
+            </script>
    </body>
 
 </html>

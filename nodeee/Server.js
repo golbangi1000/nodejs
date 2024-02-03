@@ -440,3 +440,17 @@ io.on("connection", (socket) => {
 		io.to(data.room).emit("message-broadcast", data.msg);
 	});
 });
+
+// header
+app.get("/stream/list", (req, res) => {
+	res.writeHead(200, {
+		Connection: "keep-alive",
+		"Content-Type": "text/event-stream",
+		"Cache-Control": "no-cache",
+	});
+
+	setInterval(() => {
+		res.write("event: msg\n");
+		res.write('data: {"dumbass" : "dumbass12345"}\n\n');
+	}, 1000);
+});
