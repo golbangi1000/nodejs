@@ -432,10 +432,37 @@ io.on("connection", (socket) => {
 
 	// socket.join('룸이름') 유저를 룸에 넣는건 서버만 가능
 	socket.on("ask-join", (data) => {
+		// socket.request.session;
 		socket.join(data);
 	});
 
-	socket.on("message", (data) => {
-		io.to(data.room).emit("broadcast", data.msg);
+	socket.on("message-sent", (data) => {
+		io.to(data.room).emit("message-broadcast", data.msg);
+	});
+});
+
+// header
+app.get("/stream/list", (req, res) => {
+	res.writeHead(200, {
+		Connection: "keep-alive",
+		"Content-Type": "text/event-stream",
+		"Cache-Control": "no-cache",
+	});
+
+	// setInterval(() => {
+	// 	res.write("event: msg\n");
+	// 	res.write('data: {"dumbass" : "dumbass12345"}\n\n');
+	// }, 1000);
+
+	let condition1 = [
+		{ $match: { operationType: "insert" } }, //이걸 넣으면 insert operation만 감지함
+	];
+
+	let changeStream = db.collection("post").watch(condition1); // any change in 'post' collection is "watched" 생성/수정/삭제시
+	changeStream.on("change", (result) => {
+		//this code is ran when 생성 수정 삭제 happens
+		console.log(result.fullDocument);
+		res.write("event: msg\n");
+		res.write(`data: ${JSON.stringify(result.fullDocument)}\n\n`); // array나 object를 보내고 싶으면 JSON으로 바꿔야도미
 	});
 });

@@ -18,10 +18,13 @@
                     <div class="chat-box mine"><span>안녕하세요</span></div>
                 </div>
             </div>
-            <div class="chat-form">
+            <form action="">
                 <input class="chat-input">
-                <button class="chat-button">전송</button>
-            </div>
+                <button class="chat-button" type="button">전송</button>
+            </form>
+            <!-- <div class="chat-form">
+
+            </div> -->
 </body>
 
 
@@ -29,19 +32,23 @@
 <script>
     const socket = io()
     // socket.emit('데이터이름', '데이터')
-    socket.emit('ask-join', '1')
+    socket.emit('ask-join', '<%= result._id %>')
 
     document.querySelector('.chat-button').addEventListener('click', function () {
-        socket.emit('message', { msg: 'hello message', room: 1 })
+        console.log('hi button pressed')
+        let chatInput = document.querySelector('.chat-input').value
+        socket.emit('message-sent', { msg: chatInput, room: '<%= result._id %>' }) // don't forget string '1'
     })
 
-    socket.on('name', (data) => {
-        console.log(data)
-    })//데이터 
+    // socket.on('name', (data) => {
+    //     console.log(data)
+    // })//데이터 
 
 
-    socket.on('broadcast', (data) => {
+    socket.on('message-broadcast', (data) => {
+        console.log('hello socket.on broadcast')
         console.log(data)
+        document.querySelector('.chat-screen').insertAdjacentHTML('beforeend', `<div class="chat-box"><span>${data}</span></div>`)
     })
 </script>
 
